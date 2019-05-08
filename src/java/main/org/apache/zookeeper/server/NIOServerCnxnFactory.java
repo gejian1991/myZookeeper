@@ -92,6 +92,7 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory implements Runnable 
         // 它始终在低级别的状态中运行，用于实时监控和管理系统中的可回收资源。
 
         // 所以这里的这个线程是为了和JVM生命周期绑定，只剩下这个线程时已经没有意义了，应该关闭掉。
+        // 如果设置为用户线程则永远关闭不了
         thread.setDaemon(true);
         maxClientCnxns = maxcc;
         this.ss = ServerSocketChannel.open();
@@ -126,7 +127,7 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory implements Runnable 
         start();
         setZooKeeperServer(zks);
         zks.startdata();
-        zks.startup();
+        zks.startup();//启动线程
     }
 
     @Override

@@ -301,7 +301,7 @@ public interface AsyncCallback {
          *             asynchronous calls.
          * @param opResults The list of results.
          *                  One result for each operation,
-         *                  and the order matches that of input.
+         *                  and the Order matches that of input.
          */
         public void processResult(int rc, String path, Object ctx,
                 List<OpResult> opResults);

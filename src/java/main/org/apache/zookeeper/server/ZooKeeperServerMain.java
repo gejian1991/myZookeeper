@@ -86,7 +86,7 @@ public class ZooKeeperServerMain {
             config.parse(args);
         }
 
-        runFromConfig(config);
+        runFromConfig(config);//运行
     }
 
     /**
@@ -102,14 +102,14 @@ public class ZooKeeperServerMain {
             // so rather than spawning another thread, we will just call
             // run() in this thread.
             // create a file logger url from the command line args
-            final ZooKeeperServer zkServer = new ZooKeeperServer();
+            final ZooKeeperServer zkServer = new ZooKeeperServer();//主要的zkServer服务器类
             // Registers shutdown handler which will be used to know the
             // server error or shutdown state changes.
             final CountDownLatch shutdownLatch = new CountDownLatch(1);
             zkServer.registerServerShutdownHandler(
                     new ZooKeeperServerShutdownHandler(shutdownLatch));
 
-            txnLog = new FileTxnSnapLog(new File(config.dataLogDir), new File(
+            txnLog = new FileTxnSnapLog(new File(config.dataLogDir), new File(      //工具类
                     config.dataDir));
             txnLog.setServerStats(zkServer.serverStats());
             zkServer.setTxnLogFactory(txnLog);

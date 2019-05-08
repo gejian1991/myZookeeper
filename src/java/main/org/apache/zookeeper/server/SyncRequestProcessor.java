@@ -114,7 +114,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
     }
 
     @Override
-    public void run() {
+    public void run() {             //同步处理器，进行持久化操作
         try {
             int logCount = 0;
 
@@ -137,11 +137,11 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                 }
                 if (si != null) {
                     // track the number of records written to the log
-                    if (zks.getZKDatabase().append(si)) {
+                    if (zks.getZKDatabase().append(si)) {   //将txn等操作，放入流中
                         logCount++;
                         if (logCount > (snapCount / 2 + randRoll)) {
                             setRandRoll(r.nextInt(snapCount/2));
-                            // roll the log
+                            // roll the log，滚动文件
                             zks.getZKDatabase().rollLog();
                             // take a snapshot
                             if (snapInProcess != null && snapInProcess.isAlive()) {
@@ -150,7 +150,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                                 snapInProcess = new ZooKeeperThread("Snapshot Thread") {
                                         public void run() {
                                             try {
-                                                zks.takeSnapshot();
+                                                zks.takeSnapshot();         //打快照
                                             } catch(Exception e) {
                                                 LOG.warn("Unexpected exception", e);
                                             }
@@ -165,7 +165,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                         // iff this is a read, and there are no pending
                         // flushes (writes), then just pass this to the next
                         // processor
-                        if (nextProcessor != null) {
+                        if (nextProcessor != null) {            //FinalRequestProcess
                             nextProcessor.processRequest(si);
                             if (nextProcessor instanceof Flushable) {
                                 ((Flushable)nextProcessor).flush();
@@ -175,7 +175,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                     }
                     toFlush.add(si);
                     if (toFlush.size() > 1000) {
-                        flush(toFlush);
+                        flush(toFlush);         //写出数据
                     }
                 }
             }

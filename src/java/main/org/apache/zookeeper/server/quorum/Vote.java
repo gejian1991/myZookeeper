@@ -40,10 +40,10 @@ public class Vote {
                     long zxid, 
                     long peerEpoch) {
         this.version = 0x0;
-        this.id = id;
+        this.id = id;       //myid
         this.zxid = zxid;
-        this.electionEpoch = -1;
-        this.peerEpoch = peerEpoch;
+        this.electionEpoch = -1;       //第一轮选举
+        this.peerEpoch = peerEpoch; //届号
         this.state = ServerState.LOOKING;
     }
 

@@ -78,7 +78,7 @@ public class QuorumPeerMain {
     public static void main(String[] args) {
         QuorumPeerMain main = new QuorumPeerMain();
         try {
-            main.initializeAndRun(args);
+            main.initializeAndRun(args);    //初始化配置文件
         } catch (IllegalArgumentException e) {
             LOG.error("Invalid arguments, exiting abnormally", e);
             LOG.info(USAGE);
@@ -99,9 +99,10 @@ public class QuorumPeerMain {
     protected void initializeAndRun(String[] args)
         throws ConfigException, IOException
     {
+        //QuorumPeerConfig配置类
         QuorumPeerConfig config = new QuorumPeerConfig();
         if (args.length == 1) {
-            config.parse(args[0]);
+            config.parse(args[0]);//解析配置文件
         }
 
         // Start and schedule the the purge task
@@ -111,12 +112,12 @@ public class QuorumPeerMain {
         purgeMgr.start();
 
         if (args.length == 1 && config.servers.size() > 0) {
-            runFromConfig(config);
+            runFromConfig(config);//运行集群模式
         } else {
             LOG.warn("Either no config or no quorum defined in config, running "
                     + " in standalone mode");
             // there is only server in the quorum -- run as standalone
-            ZooKeeperServerMain.main(args);
+            ZooKeeperServerMain.main(args);//运行单机模式
         }
     }
 
@@ -133,7 +134,7 @@ public class QuorumPeerMain {
           cnxnFactory.configure(config.getClientPortAddress(),
                                 config.getMaxClientCnxns());
 
-          quorumPeer = getQuorumPeer();
+          quorumPeer = getQuorumPeer();    //创建集群中的一个服务器，类
 
           quorumPeer.setQuorumPeers(config.getServers());
           quorumPeer.setTxnFactory(new FileTxnSnapLog(

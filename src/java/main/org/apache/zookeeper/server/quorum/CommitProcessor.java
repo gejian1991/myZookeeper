@@ -77,7 +77,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements RequestP
                     nextProcessor.processRequest(toProcess.get(i));
                 }
                 toProcess.clear();
-                synchronized (this) {
+                synchronized (this) {                                       //不懂，第一次不会走
                     if ((queuedRequests.size() == 0 || nextPending != null)
                             && committedRequests.size() == 0) {
                         wait();

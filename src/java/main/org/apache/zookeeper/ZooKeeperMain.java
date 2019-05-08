@@ -311,7 +311,7 @@ public class ZooKeeperMain {
             boolean jlinemissing = false;
             // only use jline if it's in the classpath
             try {
-                Class<?> consoleC = Class.forName("jline.ConsoleReader");
+                Class<?> consoleC = Class.forName("jline.ConsoleReader");//java命令行实现类
                 Class<?> completorC =
                     Class.forName("org.apache.zookeeper.JLineZNodeCompletor");
 
@@ -328,7 +328,7 @@ public class ZooKeeperMain {
 
                 String line;
                 Method readLine = consoleC.getMethod("readLine", String.class);
-                while ((line = (String)readLine.invoke(console, getPrompt())) != null) {
+                while ((line = (String)readLine.invoke(console, getPrompt())) != null) {//getPrompt()客户端命令行的前缀
                     executeLine(line); // 执行命令行的输入
                 }
             } catch (ClassNotFoundException e) {
@@ -368,8 +368,8 @@ public class ZooKeeperMain {
     throws InterruptedException, IOException, KeeperException {
       if (!line.equals("")) {
         cl.parseCommand(line);
-        addToHistory(commandCount,line);
-        processCmd(cl);
+        addToHistory(commandCount,line);//历史命令
+        processCmd(cl);//处理命令
         commandCount++;
       }
     }
@@ -688,8 +688,8 @@ public class ZooKeeperMain {
         
         if (cmd.equals("create") && args.length >= 3) {
             int first = 0;
-            CreateMode flags = CreateMode.PERSISTENT;
-            if ((args[1].equals("-e") && args[2].equals("-s"))
+            CreateMode flags = CreateMode.PERSISTENT;//创建标示
+            if ((args[1].equals("-e") && args[2].equals("-s"))//创建临时的顺序节点
                     || (args[1]).equals("-s") && (args[2].equals("-e"))) {
                 first+=2;
                 flags = CreateMode.EPHEMERAL_SEQUENTIAL;

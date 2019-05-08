@@ -202,7 +202,7 @@ public class ClientTest extends ClientBase {
 
     /**
      * Register multiple watchers and verify that they all get notified and
-     * in the right order.
+     * in the right Order.
      */
     @Test
     public void testMutipleWatcherObjs()

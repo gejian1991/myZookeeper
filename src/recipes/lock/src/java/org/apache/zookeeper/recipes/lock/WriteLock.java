@@ -219,7 +219,7 @@ public class WriteLock extends ProtocolSupport {
                         // lets force the recreation of the id
                         id = null;
                     } else {
-                        // lets sort them explicitly (though they do seem to come back in order ususally :)
+                        // lets sort them explicitly (though they do seem to come back in Order ususally :)
                         SortedSet<ZNodeName> sortedNames = new TreeSet<ZNodeName>();
                         for (String name : names) {
                             sortedNames.add(new ZNodeName(dir + "/" + name));

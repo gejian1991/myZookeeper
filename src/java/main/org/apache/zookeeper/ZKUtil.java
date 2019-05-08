@@ -88,7 +88,7 @@ public class ZKUtil {
     
     /**
      * BFS Traversal of the system under pathRoot, with the entries in the list, in the 
-     * same order as that of the traversal.
+     * same Order as that of the traversal.
      * <p>
      * <b>Important:</b> This is <i>not an atomic snapshot</i> of the tree ever, but the
      *  state as it exists across multiple RPCs from zkClient to the ensemble.

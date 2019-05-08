@@ -430,8 +430,8 @@ public class DataTree {
             updateCount(lastPrefix, 1);
             updateBytes(lastPrefix, data == null ? 0 : data.length);
         }
-        dataWatches.triggerWatch(path, Event.EventType.NodeCreated);
-        childWatches.triggerWatch(parentName.equals("") ? "/" : parentName,
+        dataWatches.triggerWatch(path, Event.EventType.NodeCreated);        //抛创建节点事件
+        childWatches.triggerWatch(parentName.equals("") ? "/" : parentName,     //子节点改变事件
                 Event.EventType.NodeChildrenChanged);
         return path;
     }

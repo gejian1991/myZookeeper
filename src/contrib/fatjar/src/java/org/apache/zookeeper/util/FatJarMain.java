@@ -77,8 +77,8 @@ public class FatJarMain {
             }
             if (parts[0].length() > 0) {
                 cmds.put(parts[0], new Cmd(parts[0], parts[1], parts[2]));
-                // We use the order array to preserve the order of the commands
-                // for help. The hashmap will not preserver order. (It may be overkill.)
+                // We use the Order array to preserve the Order of the commands
+                // for help. The hashmap will not preserver Order. (It may be overkill.)
                 order.add(parts[0]);
             } else {
                 // Just put the description in

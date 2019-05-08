@@ -466,7 +466,7 @@ public abstract class ClientBase extends ZKTestCase {
         // during the tests we run with 100K prealloc in the logs.
         // on windows systems prealloc of 64M was seen to take ~15seconds
         // resulting in test Assert.failure (client timeout on first session).
-        // set env and directly in order to handle static init/gc issues
+        // set env and directly in Order to handle static init/gc issues
         System.setProperty("zookeeper.preAllocSize", "100");
         FilePadding.setPreallocSize(100 * 1024);
     }

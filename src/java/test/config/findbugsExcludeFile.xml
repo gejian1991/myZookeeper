@@ -40,7 +40,7 @@
        <Bug pattern="DM_EXIT" />
    </Match>
 
-   <!-- Committing out of order is an unrecoverable error, so we should
+   <!-- Committing out of Order is an unrecoverable error, so we should
               really exit  -->
    <Match>
      <Class name="org.apache.zookeeper.server.quorum.FollowerZooKeeperServer" />

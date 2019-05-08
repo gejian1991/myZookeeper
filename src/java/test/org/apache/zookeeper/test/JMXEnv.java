@@ -87,7 +87,7 @@ public class JMXEnv {
     /**
      * Ensure that all of the specified names are registered.
      * Note that these are components of the name, and in particular
-     * order matters - you want the more specific name (leafs) specified
+     * Order matters - you want the more specific name (leafs) specified
      * before their parent(s) (since names are hierarchical)
      * It waits in a loop up to 60 seconds before failing if there is a
      * mismatch.
@@ -134,7 +134,7 @@ public class JMXEnv {
     /**
      * Ensure that only the specified names are registered.
      * Note that these are components of the name, and in particular
-     * order matters - you want the more specific name (leafs) specified
+     * Order matters - you want the more specific name (leafs) specified
      * before their parent(s) (since names are hierarchical)
      * @param expectedNames
      * @return

@@ -92,7 +92,7 @@ public class ZooKeeper {
     protected final ClientCnxn cnxn;
     private static final Logger LOG;
     static {
-        //Keep these two lines together to keep the initialization order explicit
+        //Keep these two lines together to keep the initialization Order explicit
         LOG = LoggerFactory.getLogger(ZooKeeper.class);
         Environment.logEnv("Client environment:", LOG);
     }
@@ -194,7 +194,7 @@ public class ZooKeeper {
             case NodeDataChanged:
             case NodeCreated:
                 synchronized (dataWatches) {
-                    addTo(dataWatches.remove(clientPath), result);
+                    addTo(dataWatches.remove(clientPath), result);//一个监听器，原生只能使用一次
                 }
                 synchronized (existWatches) {
                     addTo(existWatches.remove(clientPath), result);
@@ -350,7 +350,7 @@ public class ZooKeeper {
      * The instantiated ZooKeeper client object will pick an arbitrary server
      * from the connectString and attempt to connect to it. If establishment of
      * the connection fails, another server in the connect string will be tried
-     * (the order is non-deterministic, as we random shuffle the list), until a
+     * (the Order is non-deterministic, as we random shuffle the list), until a
      * connection is established. The client will continue attempts until the
      * session is explicitly closed.
      * <p>
@@ -399,7 +399,7 @@ public class ZooKeeper {
      * The instantiated ZooKeeper client object will pick an arbitrary server
      * from the connectString and attempt to connect to it. If establishment of
      * the connection fails, another server in the connect string will be tried
-     * (the order is non-deterministic, as we random shuffle the list), until a
+     * (the Order is non-deterministic, as we random shuffle the list), until a
      * connection is established. The client will continue attempts until the
      * session is explicitly closed.
      * <p>
@@ -444,15 +444,17 @@ public class ZooKeeper {
 
         watchManager.defaultWatcher = watcher;
 
-        // 包装地址
+        // 包装server地址
         ConnectStringParser connectStringParser = new ConnectStringParser(
                 connectString);
-
+        //将server地址打乱随机连接地址
         HostProvider hostProvider = new StaticHostProvider(
                 connectStringParser.getServerAddresses());
+        //getClientCnxnSocket()返回socket实例，ClientCnxn完成配置初始化，初始化线程sendThread，eventThread
         cnxn = new ClientCnxn(connectStringParser.getChrootPath(),
                 hostProvider, sessionTimeout, this, watchManager,
                 getClientCnxnSocket(), canBeReadOnly);
+        //启动线程
         cnxn.start();
     }
 
@@ -471,7 +473,7 @@ public class ZooKeeper {
      * The instantiated ZooKeeper client object will pick an arbitrary server
      * from the connectString and attempt to connect to it. If establishment of
      * the connection fails, another server in the connect string will be tried
-     * (the order is non-deterministic, as we random shuffle the list), until a
+     * (the Order is non-deterministic, as we random shuffle the list), until a
      * connection is established. The client will continue attempts until the
      * session is explicitly closed (or the session is expired by the server).
      * <p>
@@ -530,7 +532,7 @@ public class ZooKeeper {
      * The instantiated ZooKeeper client object will pick an arbitrary server
      * from the connectString and attempt to connect to it. If establishment of
      * the connection fails, another server in the connect string will be tried
-     * (the order is non-deterministic, as we random shuffle the list), until a
+     * (the Order is non-deterministic, as we random shuffle the list), until a
      * connection is established. The client will continue attempts until the
      * session is explicitly closed (or the session is expired by the server).
      * <p>
@@ -789,7 +791,8 @@ public class ZooKeeper {
             throw new KeeperException.InvalidACLException();
         }
         request.setAcl(acl);
-        ReplyHeader r = cnxn.submitRequest(h, request, response, null);
+        //ReplyHeader响应头
+        ReplyHeader r = cnxn.submitRequest(h, request, response, null);//提交请求
         if (r.getErr() != 0) {
             throw KeeperException.create(KeeperException.Code.get(r.getErr()),
                     clientPath);
@@ -902,8 +905,8 @@ public class ZooKeeper {
      *
      * @param ops An iterable that contains the operations to be done.
      * These should be created using the factory methods on {@link Op}.
-     * @return A list of results, one for each input Op, the order of
-     * which exactly matches the order of the <code>ops</code> input
+     * @return A list of results, one for each input Op, the Order of
+     * which exactly matches the Order of the <code>ops</code> input
      * operations.
      * @throws InterruptedException If the operation was interrupted.
      * The operation may or may not have succeeded, but will not have
@@ -1216,7 +1219,7 @@ public class ZooKeeper {
         h.setType(ZooDefs.OpCode.getData);
         GetDataRequest request = new GetDataRequest();
         request.setPath(serverPath);
-        request.setWatch(watcher != null);
+        request.setWatch(watcher != null);          //为什么要告诉服务端？只告诉一个true，false
         GetDataResponse response = new GetDataResponse();
         ReplyHeader r = cnxn.submitRequest(h, request, response, wcb);
         if (r.getErr() != 0) {
@@ -1506,7 +1509,7 @@ public class ZooKeeper {
      * path or creates/delete a child under the node.
      * <p>
      * The list of children returned is not sorted and no guarantee is provided
-     * as to its natural or lexical order.
+     * as to its natural or lexical Order.
      * <p>
      * A KeeperException with error code KeeperException.NoNode will be thrown
      * if no node with the given path exists.
@@ -1555,7 +1558,7 @@ public class ZooKeeper {
      * path or creates/delete a child under the node.
      * <p>
      * The list of children returned is not sorted and no guarantee is provided
-     * as to its natural or lexical order.
+     * as to its natural or lexical Order.
      * <p>
      * A KeeperException with error code KeeperException.NoNode will be thrown
      * if no node with the given path exists.
@@ -1620,7 +1623,7 @@ public class ZooKeeper {
      * path or creates/delete a child under the node.
      * <p>
      * The list of children returned is not sorted and no guarantee is provided
-     * as to its natural or lexical order.
+     * as to its natural or lexical Order.
      * <p>
      * A KeeperException with error code KeeperException.NoNode will be thrown
      * if no node with the given path exists.
@@ -1676,7 +1679,7 @@ public class ZooKeeper {
      * path or creates/delete a child under the node.
      * <p>
      * The list of children returned is not sorted and no guarantee is provided
-     * as to its natural or lexical order.
+     * as to its natural or lexical Order.
      * <p>
      * A KeeperException with error code KeeperException.NoNode will be thrown
      * if no node with the given path exists.
@@ -1844,6 +1847,7 @@ public class ZooKeeper {
         String clientCnxnSocketName = System
                 .getProperty(ZOOKEEPER_CLIENT_CNXN_SOCKET);
         if (clientCnxnSocketName == null) {
+            //客户端与服务端通过socketNIO连接
             clientCnxnSocketName = ClientCnxnSocketNIO.class.getName();
         }
         try {

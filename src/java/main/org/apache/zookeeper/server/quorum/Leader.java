@@ -325,7 +325,7 @@ public class Leader {
             try {
                 while (!stop) {
                     try{
-                        Socket s = ss.accept();
+                        Socket s = ss.accept();         //等待连接
                         // start with the initLimit, once the ack is processed
                         // in LearnerHandler switch to the syncLimit
                         s.setSoTimeout(self.tickTime * self.initLimit);
@@ -443,7 +443,7 @@ public class Leader {
              * on a real cluster. Specifically to enable verification that quorum
              * can handle the lower 32bit roll-over issue identified in
              * ZOOKEEPER-1277. Without this option it would take a very long
-             * time (on order of a month say) to see the 4 billion writes
+             * time (on Order of a month say) to see the 4 billion writes
              * necessary to cause the roll-over to occur.
              * 
              * This field allows you to override the zxid of the server. Typically
@@ -500,7 +500,7 @@ public class Leader {
                     // Lost quorum, shutdown
                     shutdown("Not sufficient followers synced, only synced with sids: [ "
                             + getSidSetString(syncedSet) + " ]");
-                    // make sure the order is the same!
+                    // make sure the Order is the same!
                     // the leader goes to looking
                     return;
               } 
@@ -608,7 +608,7 @@ public class Leader {
             LOG.debug("Count for zxid: 0x{} is {}",
                     Long.toHexString(zxid), p.ackSet.size());
         }
-        if (self.getQuorumVerifier().containsQuorum(p.ackSet)){             
+        if (self.getQuorumVerifier().containsQuorum(p.ackSet)){          //过半验证
             if (zxid != lastCommitted+1) {
                 LOG.warn("Commiting zxid 0x{} from {} not first!",
                         Long.toHexString(zxid), followerAddr);
@@ -622,8 +622,8 @@ public class Leader {
             if (p.request == null) {
                 LOG.warn("Going to commmit null request for proposal: {}", p);
             }
-            commit(zxid);
-            inform(p);
+            commit(zxid);           //发送commit给follower
+            inform(p);                  //发送给observer
             zk.commitProcessor.commit(p.request);
             if(pendingSyncs.containsKey(zxid)){
                 for(LearnerSyncRequest r: pendingSyncs.remove(zxid)) {
@@ -875,12 +875,12 @@ public class Leader {
             if (lastAcceptedEpoch >= epoch) {
                 epoch = lastAcceptedEpoch+1;
             }
-            if (isParticipant(sid)) {
+            if (isParticipant(sid)) {                       //判断sid是不是一个参与者
                 connectingFollowers.add(sid);
             }
             QuorumVerifier verifier = self.getQuorumVerifier();
             if (connectingFollowers.contains(self.getId()) && 
-                                            verifier.containsQuorum(connectingFollowers)) {
+                                            verifier.containsQuorum(connectingFollowers)) {     //验证器
                 waitingForNewEpoch = false;
                 self.setAcceptedEpoch(epoch);
                 connectingFollowers.notifyAll();
@@ -889,7 +889,7 @@ public class Leader {
                 long cur = start;
                 long end = start + self.getInitLimit()*self.getTickTime();
                 while(waitingForNewEpoch && cur < end) {
-                    connectingFollowers.wait(end - cur);
+                    connectingFollowers.wait(end - cur);                //等待过半
                     cur = Time.currentElapsedTime();
                 }
                 if (waitingForNewEpoch) {

@@ -273,7 +273,7 @@ public class Learner {
         LearnerInfo li = new LearnerInfo(self.getId(), 0x10000);
         ByteArrayOutputStream bsid = new ByteArrayOutputStream();
         BinaryOutputArchive boa = BinaryOutputArchive.getArchive(bsid);
-        boa.writeRecord(li, "LearnerInfo");
+        boa.writeRecord(li, "LearnerInfo");         //写数据
         qp.setData(bsid.toByteArray());
         
         writePacket(qp, true);
@@ -328,11 +328,11 @@ public class Learner {
         LinkedList<Long> packetsCommitted = new LinkedList<Long>();
         LinkedList<PacketInFlight> packetsNotCommitted = new LinkedList<PacketInFlight>();
         synchronized (zk) {
-            if (qp.getType() == Leader.DIFF) {
+            if (qp.getType() == Leader.DIFF) {                  //时diff
                 LOG.info("Getting a diff from the leader 0x{}", Long.toHexString(qp.getZxid()));
                 snapshotNeeded = false;
             }
-            else if (qp.getType() == Leader.SNAP) {
+            else if (qp.getType() == Leader.SNAP) {             //是快照
                 LOG.info("Getting a snapshot from leader 0x" + Long.toHexString(qp.getZxid()));
                 // The leader is going to dump the database
                 // clear our own database and read
@@ -393,7 +393,7 @@ public class Learner {
                     packetsNotCommitted.add(pif);
                     break;
                 case Leader.COMMIT:
-                    if (!writeToTxnLog) {
+                    if (!writeToTxnLog) {               //不需要写log
                         pif = packetsNotCommitted.peekFirst();
                         if (pif.hdr.getZxid() != qp.getZxid()) {
                             LOG.warn("Committing " + qp.getZxid() + ", but next proposal is " + pif.hdr.getZxid());
@@ -413,7 +413,7 @@ public class Learner {
                     PacketInFlight packet = new PacketInFlight();
                     packet.hdr = new TxnHeader();
                     packet.rec = SerializeUtils.deserializeTxn(qp.getData(), packet.hdr);
-                    // Log warning message if txn comes out-of-order
+                    // Log warning message if txn comes out-of-Order
                     if (packet.hdr.getZxid() != lastQueued + 1) {
                         LOG.warn("Got zxid 0x"
                                 + Long.toHexString(packet.hdr.getZxid())
@@ -435,7 +435,7 @@ public class Learner {
                         self.setCurrentEpoch(newEpoch);
                     }
                     self.cnxnFactory.setZooKeeperServer(zk);                
-                    break outerLoop;
+                    break outerLoop;                        //跳出循环
                 case Leader.NEWLEADER: // Getting NEWLEADER here instead of in discovery 
                     // means this is Zab 1.0
                     // Create updatingEpoch file and remove it after current

@@ -101,6 +101,7 @@ public final class StaticHostProvider implements HostProvider {
         }
 
         this.serverAddresses.addAll(serverAddresses);
+        //将地址打乱
         Collections.shuffle(this.serverAddresses);
     }
 
@@ -146,7 +147,7 @@ public final class StaticHostProvider implements HostProvider {
     }
 
     public InetSocketAddress next(long spinDelay) {
-        currentIndex = ++currentIndex % serverAddresses.size();
+        currentIndex = ++currentIndex % serverAddresses.size();//上次一个连接的地址，next时不会再用到++currentIndex
         if (currentIndex == lastIndex && spinDelay > 0) {
             try {
                 Thread.sleep(spinDelay);

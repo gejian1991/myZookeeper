@@ -149,7 +149,7 @@ public class QuorumPeerConfig {
                 in.close();
             }
 
-            parseProperties(cfg);
+            parseProperties(cfg);//解析
         } catch (IOException e) {
             throw new ConfigException("Error processing " + path, e);
         } catch (IllegalArgumentException e) {
@@ -194,7 +194,7 @@ public class QuorumPeerConfig {
                 electionAlg = Integer.parseInt(value);
             } else if (key.equals("quorumListenOnAllIPs")) {
                 quorumListenOnAllIPs = Boolean.parseBoolean(value);
-            } else if (key.equals("peerType")) {
+            } else if (key.equals("peerType")) {            //peerType=observer配置文件中
                 if (value.toLowerCase().equals("observer")) {
                     peerType = LearnerType.OBSERVER;
                 } else if (value.toLowerCase().equals("participant")) {
@@ -209,7 +209,7 @@ public class QuorumPeerConfig {
                 snapRetainCount = Integer.parseInt(value);
             } else if (key.equals("autopurge.purgeInterval")) {
                 purgeInterval = Integer.parseInt(value);
-            } else if (key.startsWith("server.")) {
+            } else if (key.startsWith("server.")) {         //集群配置
                 int dot = key.indexOf('.');
                 long sid = Long.parseLong(key.substring(dot + 1));
                 String parts[] = splitWithLeadingHostname(value);
@@ -234,7 +234,7 @@ public class QuorumPeerConfig {
                         throw new ConfigException("Unrecognised peertype: " + value);
                     }
                 }
-                if (type == LearnerType.OBSERVER){
+                if (type == LearnerType.OBSERVER){              //观察者
                     observers.put(Long.valueOf(sid), new QuorumServer(sid, hostname, port, electionPort, type));
                 } else {
                     servers.put(Long.valueOf(sid), new QuorumServer(sid, hostname, port, electionPort, type));
@@ -396,14 +396,14 @@ public class QuorumPeerConfig {
                  */
 
                 LOG.info("Defaulting to majority quorums");
-                quorumVerifier = new QuorumMaj(servers.size());
+                quorumVerifier = new QuorumMaj(servers.size());//集群验证器，过半
             }
 
             // Now add observers to servers, once the quorums have been
             // figured out
-            servers.putAll(observers);
+            servers.putAll(observers);//observers再加入到servers，与过半无关
 
-            File myIdFile = new File(dataDir, "myid");
+            File myIdFile = new File(dataDir, "myid");  //  路径 c:\\user\\gejian\\Desktop\\zk\\zookeeper\\data_1
             if (!myIdFile.exists()) {
                 throw new IllegalArgumentException(myIdFile.toString()
                         + " file is missing");
@@ -423,7 +423,7 @@ public class QuorumPeerConfig {
                         + " is not a number");
             }
             
-            // Warn about inconsistent peer type
+            // Warn about inconsistent peer type            observer没有配置peerType
             LearnerType roleByServersList = observers.containsKey(serverId) ? LearnerType.OBSERVER
                     : LearnerType.PARTICIPANT;
             if (roleByServersList != peerType) {

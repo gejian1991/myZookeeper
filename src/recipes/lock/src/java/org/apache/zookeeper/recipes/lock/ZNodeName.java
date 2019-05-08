@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents an ephemeral znode name which has an ordered sequence number
- * and can be sorted in order
+ * and can be sorted in Order
  *
  */
 class ZNodeName implements Comparable<ZNodeName> {

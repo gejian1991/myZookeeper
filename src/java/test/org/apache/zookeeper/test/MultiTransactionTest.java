@@ -560,7 +560,7 @@ public class MultiTransactionTest extends ClientBase {
 
         Assert.assertNull(zk.exists("/multi", null));
 
-        //Updating version solves conflict -- order matters
+        //Updating version solves conflict -- Order matters
         multi(zk, Arrays.asList(
                 Op.create("/multi", new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT),
                 Op.setData("/multi", "X".getBytes(), 0),

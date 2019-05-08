@@ -91,7 +91,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                     updateLastHeard();
                     initialized = true;
                 } else {
-                    sendThread.readResponse(incomingBuffer);
+                    sendThread.readResponse(incomingBuffer);//读取数据，接收结果
                     lenBuffer.clear();
                     incomingBuffer = lenBuffer;
                     updateLastHeard();
@@ -100,6 +100,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         }
         if (sockKey.isWritable()) { // 写就绪
             synchronized(outgoingQueue) {
+                //从outgoingQueue取数据
                 Packet p = findSendablePacket(outgoingQueue,
                         cnxn.sendThread.clientTunneledAuthenticationInProgress());
 
@@ -273,11 +274,11 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
      */
     void registerAndConnect(SocketChannel sock, InetSocketAddress addr) 
     throws IOException {
-        //
+        //注册和连接
         sockKey = sock.register(selector, SelectionKey.OP_CONNECT);
         boolean immediateConnect = sock.connect(addr);
         if (immediateConnect) {
-            sendThread.primeConnection();
+            sendThread.primeConnection();//更改了第一次连接， isFirstConnect = false;
         }
     }
     
@@ -285,7 +286,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
     void connect(InetSocketAddress addr) throws IOException {
         SocketChannel sock = createSock(); // 建立socket
         try {
-           registerAndConnect(sock, addr);
+           registerAndConnect(sock, addr);//注册和连接
         } catch (IOException e) {
             LOG.error("Unable to open socket to " + addr);
             sock.close();
@@ -358,7 +359,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         updateNow();
         for (SelectionKey k : selected) {
             SocketChannel sc = ((SocketChannel) k.channel());
-            if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {
+            if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {//已经连接
                 if (sc.finishConnect()) {
                     updateLastSendAndHeard();
                     sendThread.primeConnection();

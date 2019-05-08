@@ -212,7 +212,7 @@ public class ZooKeeperSaslClient {
                             LOG.debug("JAAS loginContext is: " + loginContext);
                         }
                         // note that the login object is static: it's shared amongst all zookeeper-related connections.
-                        // in order to ensure the login is initialized only once, it must be synchronized the code snippet.
+                        // in Order to ensure the login is initialized only once, it must be synchronized the code snippet.
                         login = new Login(loginContext, new SaslClientCallbackHandler(null, "Client"));
                         login.startThreadIfNeeded();
                         initializedLogin = true;

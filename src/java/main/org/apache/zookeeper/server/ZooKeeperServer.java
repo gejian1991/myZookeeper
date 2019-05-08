@@ -155,8 +155,8 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     /**
      * Creates a ZooKeeperServer instance. It sets everything up, but doesn't
      * actually start listening for clients until run() is invoked.
-     * 
-     * @param dataDir the directory to put the data
+     *
+     * the directory to put the data
      */
     public ZooKeeperServer(FileTxnSnapLog txnLogFactory, int tickTime,
             int minSessionTimeout, int maxSessionTimeout,
@@ -281,7 +281,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             setZxid(zkDb.getDataTreeLastProcessedZxid());
         }
         else {
-            setZxid(zkDb.loadDataBase());
+            setZxid(zkDb.loadDataBase());//反序列化数据加载到dataBase
         }
         
         // Clean up dead sessions
@@ -410,7 +410,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     
     public synchronized void startup() {
         if (sessionTracker == null) {
-            createSessionTracker();
+            createSessionTracker();//创建Session跟踪器
         }
         //
         startSessionTracker();
@@ -747,9 +747,9 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
         try {
             touch(si.cnxn);
-            boolean validpacket = Request.isValid(si.type);
+            boolean validpacket = Request.isValid(si.type);         //判断请求是否合法
             if (validpacket) {
-                firstProcessor.processRequest(si);
+                firstProcessor.processRequest(si);                  //请求处理链
                 if (si.cnxn != null) {
                     incInProcess();
                 }
@@ -970,12 +970,12 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         // pointing
         // to the start of the txn
         incomingBuffer = incomingBuffer.slice();
-        if (h.getType() == OpCode.auth) {
+        if (h.getType() == OpCode.auth) {           //addAuth命令
             LOG.info("got auth packet " + cnxn.getRemoteSocketAddress());
             AuthPacket authPacket = new AuthPacket();
             ByteBufferInputStream.byteBuffer2Record(incomingBuffer, authPacket);
             String scheme = authPacket.getScheme();
-            AuthenticationProvider ap = ProviderRegistry.getProvider(scheme);
+            AuthenticationProvider ap = ProviderRegistry.getProvider(scheme);   //验证提供者
             Code authReturn = KeeperException.Code.AUTHFAILED;
             if(ap != null) {
                 try {
@@ -1074,7 +1074,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         ProcessTxnResult rc;
         int opCode = hdr.getType();
         long sessionId = hdr.getClientId();
-        rc = getZKDatabase().processTxn(hdr, txn);
+        rc = getZKDatabase().processTxn(hdr, txn);  //更改内存数据，抛出监听内容
         if (opCode == OpCode.createSession) {
             if (txn instanceof CreateSessionTxn) {
                 CreateSessionTxn cst = (CreateSessionTxn) txn;

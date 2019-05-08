@@ -40,7 +40,7 @@ public class SessionInvalidationTest extends ClientBase {
      * Test solution for ZOOKEEPER-1208. Verify that operations are not
      * accepted after a close session.
      * 
-     * We're using our own marshalling here in order to force an operation
+     * We're using our own marshalling here in Order to force an operation
      * after the session is closed (ZooKeeper.class will not allow this). Also
      * by filling the pipe with operations it increases the likelyhood that
      * the server will process the create before FinalRequestProcessor

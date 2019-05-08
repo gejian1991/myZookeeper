@@ -153,7 +153,7 @@ public class DistributedQueue {
         // We want to return the child node with the smallest sequence number.
         // Since other clients are remove()ing and take()ing nodes concurrently, 
         // the child with the smallest sequence number in orderedChildren might be gone by the time we check.
-        // We don't call getChildren again until we have tried the rest of the nodes in sequence order.
+        // We don't call getChildren again until we have tried the rest of the nodes in sequence Order.
         while(true){
             try{
                 orderedChildren = orderedChildren(null);

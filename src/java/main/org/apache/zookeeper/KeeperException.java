@@ -39,7 +39,7 @@ public abstract class KeeperException extends Exception {
 
     /**
      * All non-specific keeper exceptions should be constructed via
-     * this factory method in order to guarantee consistency in error
+     * this factory method in Order to guarantee consistency in error
      * codes and such.  If you know the error code, then you should
      * construct the special purpose exception directly.  That will
      * allow you to have the most specific possible declarations of
@@ -78,7 +78,7 @@ public abstract class KeeperException extends Exception {
 
     /**
      * All non-specific keeper exceptions should be constructed via
-     * this factory method in order to guarantee consistency in error
+     * this factory method in Order to guarantee consistency in error
      * codes and such.  If you know the error code, then you should
      * construct the special purpose exception directly.  That will
      * allow you to have the most specific possible declarations of

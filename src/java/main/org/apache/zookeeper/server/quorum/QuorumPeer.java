@@ -632,10 +632,10 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     
     @Override
     public synchronized void start() {
-        loadDataBase();
-        cnxnFactory.start();        
-        startLeaderElection();
-        super.start();
+        loadDataBase();         //从快照中导出数据到内存
+        cnxnFactory.start();       //开启客户端请求,开启读取数据线程
+        startLeaderElection();      //领导者选举
+        super.start();              //进入QuorumPeer的run方法
     }
 
     private void loadDataBase() {
@@ -702,6 +702,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     }
     synchronized public void startLeaderElection() {
     	try {
+    	    //生成投票，投自己
     		currentVote = new Vote(myid, getLastLoggedZxid(), getCurrentEpoch());
     	} catch(IOException e) {
     		RuntimeException re = new RuntimeException(e.getMessage());
@@ -821,10 +822,12 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
             le = new AuthFastLeaderElection(this, true);
             break;
         case 3:
+            //初始化负责各台服务器之间的底层leader选举过程中的网络通信
             qcm = createCnxnManager();
             QuorumCnxManager.Listener listener = qcm.listener;
             if(listener != null){
                 listener.start();
+                //默认使用快速领导者选举
                 le = new FastLeaderElection(this, qcm);
             } else {
                 LOG.error("Null listener when initializing cnx manager");
@@ -952,9 +955,11 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
                             roZk.shutdown();
                         }
                     } else {
+                        //直接看这里
                         try {
+                            //兼容性代码
                             setBCVote(null);
-                            setCurrentVote(makeLEStrategy().lookForLeader());
+                            setCurrentVote(makeLEStrategy().lookForLeader());//重要
                         } catch (Exception e) {
                             LOG.warn("Unexpected exception", e);
                             setPeerState(ServerState.LOOKING);
@@ -991,7 +996,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
                     LOG.info("LEADING");
                     try {
                         setLeader(makeLeader(logFactory));
-                        leader.lead();
+                        leader.lead();                      //leader操作
                         setLeader(null);
                     } catch (Exception e) {
                         LOG.warn("Unexpected exception",e);

@@ -76,7 +76,7 @@ public class WatcherTest extends ClientBase {
     public void setUp() throws Exception {
         super.setUp();
         // Reset to default value since some test cases set this to true.
-        // Needed for JDK7 since unit test can run is random order
+        // Needed for JDK7 since unit test can run is random Order
         ClientCnxn.setDisableAutoResetWatch(false);
     }
 

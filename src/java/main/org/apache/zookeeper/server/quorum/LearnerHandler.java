@@ -319,7 +319,7 @@ public class LearnerHandler extends ZooKeeperThread {
 
             ia = BinaryInputArchive.getArchive(bufferedInput);
             bufferedOutput = new BufferedOutputStream(sock.getOutputStream());
-            oa = BinaryOutputArchive.getArchive(bufferedOutput);
+            oa = BinaryOutputArchive.getArchive(bufferedOutput);            //ia，oa都是nio可理解为socket
 
             QuorumPacket qp = new QuorumPacket();
             ia.readRecord(qp, "packet");
@@ -350,12 +350,12 @@ public class LearnerHandler extends ZooKeeperThread {
                   learnerType = LearnerType.OBSERVER;
             }            
             
-            long lastAcceptedEpoch = ZxidUtils.getEpochFromZxid(qp.getZxid());
+            long lastAcceptedEpoch = ZxidUtils.getEpochFromZxid(qp.getZxid());//epoch
             
             long peerLastZxid;
             StateSummary ss = null;
             long zxid = qp.getZxid();
-            long newEpoch = leader.getEpochToPropose(this.getSid(), lastAcceptedEpoch);
+            long newEpoch = leader.getEpochToPropose(this.getSid(), lastAcceptedEpoch);//sid为follower的sid时myid，learner的epoch，这个方法是每个线程共用的
             
             if (this.getVersion() < 0x10000) {
                 // we are going to have to extrapolate the epoch information
@@ -405,7 +405,7 @@ public class LearnerHandler extends ZooKeeperThread {
 
                 LinkedList<Proposal> proposals = leader.zk.getZKDatabase().getCommittedLog();
 
-                if (peerLastZxid == leader.zk.getZKDatabase().getDataTreeLastProcessedZxid()) {
+                if (peerLastZxid == leader.zk.getZKDatabase().getDataTreeLastProcessedZxid()) {     //follower的id与Leader的id相同
                     // Follower is already sync with us, send empty diff
                     LOG.info("leader and follower are in sync, zxid=0x{}",
                             Long.toHexString(peerLastZxid));
@@ -429,10 +429,10 @@ public class LearnerHandler extends ZooKeeperThread {
                         // If we are here, we can use committedLog to sync with
                         // follower. Then we only need to decide whether to
                         // send trunc or not
-                        packetToSend = Leader.DIFF;
+                        packetToSend = Leader.DIFF;             //同步不一样的数据
                         zxidToSend = maxCommittedLog;
 
-                        for (Proposal propose: proposals) {
+                        for (Proposal propose: proposals) {         //LinkedList中数据
                             // skip the proposals the peer already has
                             if (propose.packet.getZxid() <= peerLastZxid) {
                                 prevProposalZxid = propose.packet.getZxid();
@@ -450,13 +450,13 @@ public class LearnerHandler extends ZooKeeperThread {
                                         updates = zxidToSend;
                                     }
                                 }
-                                queuePacket(propose.packet);
+                                queuePacket(propose.packet);        //加入到队列中
                                 QuorumPacket qcommit = new QuorumPacket(Leader.COMMIT, propose.packet.getZxid(),
                                         null, null);
                                 queuePacket(qcommit);
                             }
                         }
-                    } else if (peerLastZxid > maxCommittedLog) {
+                    } else if (peerLastZxid > maxCommittedLog) {        //follower中的id大于最大值，让follower数据回滚
                         LOG.debug("Sending TRUNC to follower zxidToSend=0x{} updates=0x{}",
                                 Long.toHexString(maxCommittedLog),
                                 Long.toHexString(updates));
@@ -488,7 +488,7 @@ public class LearnerHandler extends ZooKeeperThread {
             }
             bufferedOutput.flush();
             //Need to set the zxidToSend to the latest zxid
-            if (packetToSend == Leader.SNAP) {
+            if (packetToSend == Leader.SNAP) {                                          //快照同步
                 zxidToSend = leader.zk.getZKDatabase().getDataTreeLastProcessedZxid();
             }
             oa.writeRecord(new QuorumPacket(packetToSend, zxidToSend, null, null), "packet");
@@ -510,7 +510,7 @@ public class LearnerHandler extends ZooKeeperThread {
             
             // Start sending packets
             new Thread() {
-                public void run() {
+                public void run() {                         //线程发送数据
                     Thread.currentThread().setName(
                             "Sender-" + sock.getRemoteSocketAddress());
                     try {
@@ -552,7 +552,7 @@ public class LearnerHandler extends ZooKeeperThread {
             // so we need to mark when the peer can actually start
             // using the data
             //
-            queuedPackets.add(new QuorumPacket(Leader.UPTODATE, -1, null, null));
+            queuedPackets.add(new QuorumPacket(Leader.UPTODATE, -1, null, null));       //让learner同步完数据
 
             while (true) {
                 qp = new QuorumPacket();
@@ -623,7 +623,7 @@ public class LearnerHandler extends ZooKeeperThread {
                     qp.setData(bos.toByteArray());
                     queuedPackets.add(qp);
                     break;
-                case Leader.REQUEST:                    
+                case Leader.REQUEST:                    //Learner给leader发一个请求
                     bb = ByteBuffer.wrap(qp.getData());
                     sessionId = bb.getLong();
                     cxid = bb.getInt();

@@ -104,7 +104,7 @@ public class ZxidRolloverTest extends TestCase {
         } catch (ConnectionLossException e) {
             // second chance...
             // in some cases, leader change in particular, the timing is
-            // very tricky to get right in order to assure that the client has
+            // very tricky to get right in Order to assure that the client has
             // disconnected and reconnected. In some cases the client will
             // disconnect, then attempt to reconnect before the server is
             // back, in which case we'll see another connloss on the operation

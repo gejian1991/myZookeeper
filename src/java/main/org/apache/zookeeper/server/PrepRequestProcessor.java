@@ -275,7 +275,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
     //
     static void checkACL(ZooKeeperServer zks, List<ACL> acl, int perm,
             List<Id> ids) throws KeeperException.NoAuthException {
-        if (skipACL) {
+        if (skipACL) {      //跳过ACL
             return;
         }
         if (acl == null || acl.size() == 0) {
@@ -288,7 +288,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         }
         for (ACL a : acl) {
             Id id = a.getId();
-            if ((a.getPerms() & perm) != 0) {
+            if ((a.getPerms() & perm) != 0) {    //拥有权限与验证权限与
                 if (id.getScheme().equals("world")
                         && id.getId().equals("anyone")) {
                     return;
@@ -342,11 +342,11 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                     throw new KeeperException.InvalidACLException(path);
                 }
                 String parentPath = path.substring(0, lastSlash);
-                ChangeRecord parentRecord = getRecordForPath(parentPath);
+                ChangeRecord parentRecord = getRecordForPath(parentPath);           //父节点当前的纪录
 
-                checkACL(zks, parentRecord.acl, ZooDefs.Perms.CREATE,
+                checkACL(zks, parentRecord.acl, ZooDefs.Perms.CREATE,                           //验证ACL
                         request.authInfo);
-                int parentCVersion = parentRecord.stat.getCversion();
+                int parentCVersion = parentRecord.stat.getCversion();               //CVersion子节点的版本
                 CreateMode createMode =
                     CreateMode.fromFlag(createRequest.getFlags());
                 if (createMode.isSequential()) {
@@ -360,7 +360,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 } catch (KeeperException.NoNodeException e) {
                     // ignore this one
                 }
-                boolean ephemeralParent = parentRecord.stat.getEphemeralOwner() != 0;
+                boolean ephemeralParent = parentRecord.stat.getEphemeralOwner() != 0;       //是不是临时节点
                 if (ephemeralParent) {
                     throw new KeeperException.NoChildrenForEphemeralsException(path);
                 }
@@ -374,7 +374,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 }
                 parentRecord = parentRecord.duplicate(request.hdr.getZxid());
                 parentRecord.childCount++;
-                parentRecord.stat.setCversion(newCversion);
+                parentRecord.stat.setCversion(newCversion);         //更新父节点信息
                 addChangeRecord(parentRecord);
                 addChangeRecord(new ChangeRecord(request.hdr.getZxid(), path, s,
                         0, listACL));
@@ -438,7 +438,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 path = setAclRequest.getPath();
                 validatePath(path, request.sessionId);
                 listACL = removeDuplicates(setAclRequest.getAcl());
-                if (!fixupACL(request.authInfo, listACL)) {
+                if (!fixupACL(request.authInfo, listACL)) {             //更改列表的权限
                     throw new KeeperException.InvalidACLException(path);
                 }
                 nodeRecord = getRecordForPath(path);
@@ -469,7 +469,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 // this request is the last of the session so it should be ok
                 //zks.sessionTracker.checkSession(request.sessionId, request.getOwner());
                 HashSet<String> es = zks.getZKDatabase()
-                        .getEphemerals(request.sessionId);
+                        .getEphemerals(request.sessionId);          //获取临时节点，临时节点与sessionId绑定
                 synchronized (zks.outstandingChanges) {
                     for (ChangeRecord c : zks.outstandingChanges) {
                         if (c.stat == null) {
@@ -681,7 +681,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
             }
         }
         request.zxid = zks.getZxid();
-        nextProcessor.processRequest(request);
+        nextProcessor.processRequest(request);          //调用下一个处理器
     }
 
     private List<ACL> removeDuplicates(List<ACL> acl) {
@@ -718,7 +718,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         Iterator<ACL> it = acl.iterator();
         LinkedList<ACL> toAdd = null;
         while (it.hasNext()) {
-            ACL a = it.next();
+            ACL a = it.next();              //刚刚设置的acl权限
             Id id = a.getId();
             if (id.getScheme().equals("world") && id.getId().equals("anyone")) {
                 // wide open
@@ -760,7 +760,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 acl.add(a);
             }
         }
-        return acl.size() > 0;
+        return acl.size() > 0;          //返回的用户都有同样的acl权限
     }
 
     public void processRequest(Request request) {

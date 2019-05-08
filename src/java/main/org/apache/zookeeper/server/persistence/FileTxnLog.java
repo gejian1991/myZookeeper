@@ -241,7 +241,7 @@ public class FileTxnLog implements TxnLog {
     /**
      * Find the log file that starts at, or just before, the snapshot. Return
      * this and all subsequent logs. Results are ordered by zxid of file,
-     * ascending order.
+     * ascending Order.
      * @param logDirList array of files
      * @param snapshotZxid return files at, or before this zxid
      * @return
@@ -320,7 +320,7 @@ public class FileTxnLog implements TxnLog {
      */
     public synchronized void commit() throws IOException {
         if (logStream != null) {
-            logStream.flush();
+            logStream.flush();      //从流中写出
         }
         for (FileOutputStream log : streamsToFlush) {
             log.flush();

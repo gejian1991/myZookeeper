@@ -208,7 +208,7 @@ public class NIOServerCnxn extends ServerCnxn {
             if (!initialized) {
                 readConnectRequest();
             } else {
-                readRequest();
+                readRequest();          // 已经连接成功
             }
             lenBuffer.clear();
             incomingBuffer = lenBuffer;
@@ -216,7 +216,7 @@ public class NIOServerCnxn extends ServerCnxn {
     }
 
     /**
-     * Only used in order to allow testing
+     * Only used in Order to allow testing
      */
     protected boolean isSocketOpen() {
         return sock.isOpen();

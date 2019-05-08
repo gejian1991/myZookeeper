@@ -763,14 +763,14 @@ public class ClientCnxn {
                 }
                 return;
             }
-            if (replyHdr.getXid() == -1) {
+            if (replyHdr.getXid() == -1) {          //事件
                 // -1 means notification
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Got notification sessionid:0x"
                         + Long.toHexString(sessionId));
                 }
                 WatcherEvent event = new WatcherEvent();
-                event.deserialize(bbia, "response");
+                event.deserialize(bbia, "response");    //从数据流解析Event
 
                 // convert from a server path to a client path
                 if (chrootPath != null) {
@@ -816,14 +816,14 @@ public class ClientCnxn {
                 packet = pendingQueue.remove();
             }
             /*
-             * Since requests are processed in order, we better get a response
+             * Since requests are processed in Order, we better get a response
              * to the first request!
              */
             try {
                 if (packet.requestHeader.getXid() != replyHdr.getXid()) {
                     packet.replyHeader.setErr(
                             KeeperException.Code.CONNECTIONLOSS.intValue());
-                    throw new IOException("Xid out of order. Got Xid "
+                    throw new IOException("Xid out of Order. Got Xid "
                             + replyHdr.getXid() + " with err " +
                             + replyHdr.getErr() +
                             " expected Xid "
@@ -881,6 +881,7 @@ public class ClientCnxn {
                      + ", initiating session");
             isFirstConnect = false;
             long sessId = (seenRwServerBefore) ? sessionId : 0;
+            //连接对象ConnectRequest
             ConnectRequest conReq = new ConnectRequest(0, lastZxid,
                     sessionTimeout, sessId, sessionPasswd);
             synchronized (outgoingQueue) {
@@ -992,11 +993,11 @@ public class ClientCnxn {
         private void startConnect(InetSocketAddress addr) throws IOException {
             // initializing it for new connection
             saslLoginFailed = false;
-            state = States.CONNECTING;
+            state = States.CONNECTING;//连接中
 
             setName(getName().replaceAll("\\(.*\\)",
                     "(" + addr.getHostName() + ":" + addr.getPort() + ")"));
-            if (ZooKeeperSaslClient.isEnabled()) {
+            if (ZooKeeperSaslClient.isEnabled()) {//先不用管一个单独的模式
                 try {
                     String principalUserName = System.getProperty(
                             ZK_SASL_CLIENT_USERNAME, "zookeeper");
@@ -1016,8 +1017,8 @@ public class ClientCnxn {
                     saslLoginFailed = true;
                 }
             }
-            logStartConnect(addr);
-
+            logStartConnect(addr);//打印日志
+            //只有一个实现类ClientCnxnSocketNIO
             clientCnxnSocket.connect(addr);
         }
 
@@ -1065,7 +1066,7 @@ public class ClientCnxn {
                         clientCnxnSocket.updateLastSendAndHeard();
                     }
 
-                    if (state.isConnected()) {
+                    if (state.isConnected()) {              //连接成功
                         // determine whether we need to send an AuthFailed event.
                         if (zooKeeperSaslClient != null) {
                             boolean sendAuthEvent = false;
@@ -1097,11 +1098,11 @@ public class ClientCnxn {
                                       authState,null));
                             }
                         }
-                        to = readTimeout - clientCnxnSocket.getIdleRecv();  //
+                        to = readTimeout - clientCnxnSocket.getIdleRecv();  //读取数据的时间，是否超时
                     } else {
                         to = connectTimeout - clientCnxnSocket.getIdleRecv();
                     }
-                    
+                    //连接超时
                     if (to <= 0) {
                         String warnInfo;
                         warnInfo = "Client session timed out, have not heard from server in "
@@ -1112,6 +1113,7 @@ public class ClientCnxn {
                         LOG.warn(warnInfo);
                         throw new SessionTimeoutException(warnInfo);
                     }
+                    //连接成功
                     if (state.isConnected()) {
                     	//1000(1 second) is to prevent race condition missing to send the second ping
                     	//also make sure not to send too many pings when readTimeout is small 
@@ -1119,6 +1121,7 @@ public class ClientCnxn {
                         		((clientCnxnSocket.getIdleSend() > 1000) ? 1000 : 0);
                         //send a ping request either time is due or no packet sent out within MAX_SEND_PING_INTERVAL
                         if (timeToNextPing <= 0 || clientCnxnSocket.getIdleSend() > MAX_SEND_PING_INTERVAL) {
+                            //发送ping
                             sendPing();
                             clientCnxnSocket.updateLastSend();
                         } else {
@@ -1128,7 +1131,7 @@ public class ClientCnxn {
                         }
                     }
 
-                    // If we are in read-only mode, seek for read/write server
+                    // If we are in read-only mode, seek for read/write server，跟只读模式有关
                     if (state == States.CONNECTEDREADONLY) {
                         long now = Time.currentElapsedTime();
                         int idlePingRwServer = (int) (now - lastPingRwServer);
@@ -1142,7 +1145,7 @@ public class ClientCnxn {
                         to = Math.min(to, pingRwTimeout - idlePingRwServer);
                     }
 
-                    clientCnxnSocket.doTransport(to, pendingQueue, outgoingQueue, ClientCnxn.this);
+                    clientCnxnSocket.doTransport(to, pendingQueue, outgoingQueue, ClientCnxn.this);//很重要
                 } catch (Throwable e) {
                     if (closing) {
                         if (LOG.isDebugEnabled()) {
@@ -1307,7 +1310,7 @@ public class ClientCnxn {
                     + (isRO ? " (READ-ONLY mode)" : ""));
             KeeperState eventState = (isRO) ?
                     KeeperState.ConnectedReadOnly : KeeperState.SyncConnected;
-            //
+            //连接成功在本地触发EventType.None的事件
             eventThread.queueEvent(new WatchedEvent(
                     Watcher.Event.EventType.None,
                     eventState, null));
